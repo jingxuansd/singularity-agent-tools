@@ -1,0 +1,6 @@
+interface:
+  display_name: "Singularity Skills"
+  short_description: "Use Singularity Radar for A-share research"
+  default_prompt: "Use $singularity-skills to run research with Singularity Radar."
+policy:
+  allow_implicit_invocation: true
