@@ -1,0 +1,104 @@
+openapi: 3.1.0
+info:
+  title: Singularity Agent Tools
+  version: 0.1.0
+  description: Research-only HTTP contract for agent integrations with Singularity Radar. Authenticate protected endpoints with a user API token created inside Singularity Radar.
+security:
+  - bearerAuth: []
+servers:
+  - url: https://example.com
+    description: Replace with deployed Singularity Radar base URL.
+paths:
+  /api/market-direction:
+    get:
+      operationId: getMarketDirection
+      summary: Get latest market direction analysis
+      responses:
+        "200":
+          description: Latest market direction analysis
+  /api/stock/screener:
+    post:
+      operationId: searchStocks
+      summary: Screen A-share stocks with Singularity Radar factors
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StockSearchFilters"
+      responses:
+        "200":
+          description: Matching stocks and research signals
+  /api/stock/analyze:
+    get:
+      operationId: analyzeStock
+      summary: Analyze one A-share stock
+      parameters:
+        - name: ticker
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Stock analysis
+  /api/stock/sell-signals/{ticker}:
+    post:
+      operationId: getSellSignals
+      summary: Compute sell-signal research context
+      parameters:
+        - name: ticker
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Sell-signal context
+  /api/research/brief:
+    post:
+      operationId: generateResearchBrief
+      summary: Generate a structured research brief
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ticker:
+                  type: string
+                topic:
+                  type: string
+      responses:
+        "200":
+          description: Structured research brief
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Singularity user API token
+  schemas:
+    StockSearchFilters:
+      type: object
+      properties:
+        query:
+          type: string
+        industry:
+          type: string
+        minLynchScore:
+          type: number
+          minimum: 0
+          maximum: 100
+        minRsRating:
+          type: number
+          minimum: 0
+          maximum: 100
+        maxPeg:
+          type: number
+          exclusiveMinimum: 0
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
