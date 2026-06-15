@@ -12,11 +12,76 @@ The tools are research-only. They provide screening context, model outputs, evid
 
 ## Quick Start
 
+### 1. Create a Singularity API token
+
+Sign in to Singularity Radar and create a user API token.
+
+The platform should return the raw token once. Store it somewhere safe; the server only keeps a hash and cannot show the token again.
+
+Until the product UI is available, create a token from an authenticated browser/session:
+
 ```bash
+curl -X POST "https://your-singularity-domain.com/api/tokens" \
+  -H "content-type: application/json" \
+  -b "your-authenticated-cookie" \
+  -d '{
+    "name": "Claude Desktop",
+    "scopes": ["research:read"]
+  }'
+```
+
+Use the returned `token` as `SINGULARITY_API_TOKEN`.
+
+### 2. Install this MCP server
+
+```bash
+git clone https://github.com/jingxuansd/singularity-agent-tools.git
+cd singularity-agent-tools
 npm install
 cp .env.example .env
+```
+
+Edit `.env`:
+
+```bash
+SINGULARITY_API_BASE_URL=https://your-singularity-domain.com
+SINGULARITY_API_TOKEN=sgr_xxx
+```
+
+### 3. Verify it starts
+
+```bash
 npm run dev
 ```
+
+The server uses stdio MCP transport, so it waits for an MCP client to connect. Use `Ctrl+C` to stop the manual run.
+
+### 4. Connect an agent client
+
+Most MCP clients need a command and environment variables:
+
+```json
+{
+  "mcpServers": {
+    "singularity": {
+      "command": "npm",
+      "args": ["run", "start", "--prefix", "/absolute/path/to/singularity-agent-tools"],
+      "env": {
+        "SINGULARITY_API_BASE_URL": "https://your-singularity-domain.com",
+        "SINGULARITY_API_TOKEN": "sgr_xxx"
+      }
+    }
+  }
+}
+```
+
+Build first if your client uses `npm run start`:
+
+```bash
+npm run build
+```
+
+For more client examples, see [docs/client-setup.md](docs/client-setup.md).
 
 ## Environment
 
@@ -36,6 +101,40 @@ Create a token from Singularity Radar through `POST /api/tokens` while signed in
 | `singularity_analyze_stock` | Analyze one stock by ticker |
 | `singularity_get_sell_signals` | Compute sell-signal context for a ticker |
 | `singularity_generate_research_brief` | Produce a structured research brief |
+
+## Example Agent Prompts
+
+After the MCP server is connected, ask your agent:
+
+```text
+Use Singularity to summarize the current A-share market direction.
+```
+
+```text
+Use Singularity to find A-share companies with Lynch score above 75, RS Rating above 80, and PEG below 1.5.
+```
+
+```text
+Use Singularity to analyze ticker 300750 and separate facts, model signals, and risks.
+```
+
+## Token Management
+
+List your tokens:
+
+```bash
+curl "https://your-singularity-domain.com/api/tokens" \
+  -b "your-authenticated-cookie"
+```
+
+Revoke a token:
+
+```bash
+curl -X DELETE "https://your-singularity-domain.com/api/tokens/{token_id}" \
+  -b "your-authenticated-cookie"
+```
+
+Do not commit `.env` or paste tokens into prompts.
 
 ## Development
 
