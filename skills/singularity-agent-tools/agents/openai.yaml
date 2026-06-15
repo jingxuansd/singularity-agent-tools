@@ -1,0 +1,6 @@
+interface:
+  display_name: "Singularity Agent Tools"
+  short_description: "Connect agents to Singularity Radar research"
+  default_prompt: "Use $singularity-agent-tools to connect my agent to Singularity Radar and run A-share research."
+policy:
+  allow_implicit_invocation: true

@@ -10,6 +10,37 @@ This project exposes Singularity Radar capabilities through:
 
 The tools are research-only. They provide screening context, model outputs, evidence, and risk notes. They do not provide personalized investment advice.
 
+## Install Options
+
+### Install the Skill
+
+Use this when you want Codex, Cursor, Claude Code, Gemini CLI, Copilot, or another Agent Skills host to understand how to use Singularity Radar:
+
+```bash
+npx skills add jingxuansd/singularity-agent-tools -g
+```
+
+Update later:
+
+```bash
+npx skills update singularity-agent-tools -g
+```
+
+The Skill lives at [skills/singularity-agent-tools/SKILL.md](skills/singularity-agent-tools/SKILL.md).
+
+### Install the MCP Runtime
+
+Use this when you want live MCP tools that call Singularity Radar:
+
+```bash
+git clone https://github.com/jingxuansd/singularity-agent-tools.git
+cd singularity-agent-tools
+npm install
+npm run build
+```
+
+The `npx skills add` path installs the agent instructions. The MCP runtime still needs this repository checkout and Node dependencies.
+
 ## Quick Start
 
 ### 1. Create a Singularity API token
@@ -39,6 +70,7 @@ git clone https://github.com/jingxuansd/singularity-agent-tools.git
 cd singularity-agent-tools
 npm install
 cp .env.example .env
+npm run build
 ```
 
 Edit `.env`:
