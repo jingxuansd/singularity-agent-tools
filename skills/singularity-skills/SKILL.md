@@ -50,6 +50,56 @@ research:read
 
 The raw token is shown once by Singularity Radar. Never ask the user to paste tokens into chat unless there is no safer local configuration path.
 
+Guide the user to create and manage tokens from:
+
+```text
+/{locale}/settings
+```
+
+Use `/zh/settings` for Chinese UI or `/en/settings` for English UI.
+
+### Verify The Token
+
+Before helping the user wire an external tool, recommend verifying the token:
+
+```bash
+curl https://your-singularity-domain.com/api/tokens/verify \
+  -H "Authorization: Bearer sgr_xxx"
+```
+
+For local development:
+
+```bash
+curl http://localhost:3000/api/tokens/verify \
+  -H "Authorization: Bearer sgr_xxx"
+```
+
+A valid token returns `ok: true`, token name, scopes, and expiration time. An invalid, revoked, or expired token returns `401` or `403`.
+
+### Bearer Token Usage
+
+External agents and scripts should store:
+
+```bash
+SINGULARITY_API_BASE_URL=https://your-singularity-domain.com
+SINGULARITY_API_TOKEN=sgr_xxx
+```
+
+Requests to Singularity research APIs should include:
+
+```text
+Authorization: Bearer ${SINGULARITY_API_TOKEN}
+```
+
+Example:
+
+```bash
+curl https://your-singularity-domain.com/api/market-direction \
+  -H "Authorization: Bearer sgr_xxx"
+```
+
+If the user reports that a bad token still returns data from a specific endpoint, explain that the endpoint may not yet enforce Bearer-token validation and should be wired to Singularity's token authenticator.
+
 ## How To Use
 
 If the current agent environment has direct tools or APIs for Singularity Radar, use them. If no direct tools are available, guide the user to:
@@ -57,7 +107,8 @@ If the current agent environment has direct tools or APIs for Singularity Radar,
 1. Sign in to Singularity Radar.
 2. Create a user API token.
 3. Provide the token to their chosen agent integration through local secret storage or environment configuration.
-4. Ask research questions in terms of market direction, industry cycle, stock screening, individual stock analysis, or sell-risk context.
+4. Verify it with `/api/tokens/verify`.
+5. Ask research questions in terms of market direction, industry cycle, stock screening, individual stock analysis, or sell-risk context.
 
 ## Research Workflows
 

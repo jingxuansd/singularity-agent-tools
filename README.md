@@ -40,13 +40,84 @@ The Skill is research-only. It helps agents describe findings, scores, evidence,
 
 ## Token Management
 
-Singularity Radar should issue user API tokens from the main product. Tokens should be stored in the user's agent integration or local secret storage, not pasted into prompts.
+Singularity Radar issues user API tokens from the main product settings page.
+
+1. Sign in to Singularity Radar.
+2. Open `/{locale}/settings`, for example `/zh/settings` or `/en/settings`.
+3. Create a token and choose an expiration period.
+4. Copy the token immediately. The full token is shown only once.
+5. Store it in your agent integration, shell secret store, or local environment file.
+
+Tokens should be stored in the user's agent integration or local secret storage, not pasted into prompts.
 
 Required minimum scope:
 
 ```text
 research:read
 ```
+
+### Verify A Token
+
+Use the token verification endpoint before wiring an external tool:
+
+```bash
+curl https://your-singularity-domain.com/api/tokens/verify \
+  -H "Authorization: Bearer sgr_xxx"
+```
+
+Expected success response:
+
+```json
+{
+  "ok": true,
+  "token": {
+    "name": "Agent research token",
+    "scopes": ["research:read"],
+    "expiresAt": "2026-09-14T00:00:00.000Z"
+  }
+}
+```
+
+### Call Research APIs
+
+Use the token as a Bearer token:
+
+```bash
+curl https://your-singularity-domain.com/api/market-direction \
+  -H "Authorization: Bearer sgr_xxx"
+```
+
+For local development:
+
+```bash
+curl http://localhost:3000/api/market-direction \
+  -H "Authorization: Bearer sgr_xxx"
+```
+
+If a bad token is provided, token-protected APIs should return `401` or `403`.
+
+### Agent Environment Pattern
+
+For custom agents or scripts, store:
+
+```bash
+SINGULARITY_API_BASE_URL=https://your-singularity-domain.com
+SINGULARITY_API_TOKEN=sgr_xxx
+```
+
+Then send requests with:
+
+```text
+Authorization: Bearer ${SINGULARITY_API_TOKEN}
+```
+
+### Rotate Or Revoke
+
+Return to `/{locale}/settings` to revoke a token. Create a new token when:
+
+- The old token expires.
+- A token may have been exposed.
+- You are moving an integration to another machine or agent client.
 
 ## Example Agent Prompts
 
